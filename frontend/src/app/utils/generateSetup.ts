@@ -141,6 +141,7 @@ function repoContextBlock(repoAnalysis: RepoAnalysis | null): string {
 **Default Branch:** ${repoAnalysis.defaultBranch}
 **Tree Scan Status:** ${repoAnalysis.treeScanStatus}
 **Matched Setup Files:** ${repoAnalysis.matchedFiles.length}
+**Fetched File Excerpts:** ${repoAnalysis.fileExcerpts?.length ?? 0}
 
 ### Findings
 - README present: ${repoAnalysis.hasReadme ? "Yes" : "No"}
@@ -148,6 +149,9 @@ function repoContextBlock(repoAnalysis: RepoAnalysis | null): string {
 - AI instruction files present: ${repoAnalysis.hasAIInstructions ? "Yes" : "No"}
 - Decision log present: ${repoAnalysis.hasDecisionLog ? "Yes" : "No"}
 - Test setup detected: ${repoAnalysis.hasTestSetup ? "Yes" : "No"}
+
+### File Excerpts Available
+${repoAnalysis.fileExcerpts?.map((file) => `- ${file.path}${file.truncated ? " (truncated)" : ""}`).join("\n") || "- No file excerpts fetched"}
 
 ### Warnings
 ${repoAnalysis.warnings.length > 0 ? repoAnalysis.warnings.map((warning) => `- ${warning}`).join("\n") : "- No major warnings from the shallow review."}
@@ -361,6 +365,9 @@ ${data.repoAnalysis.folderStructure.map((path) => `- ${path}`).join("\n") || "- 
 
 ## Matched Files
 ${data.repoAnalysis.matchedFiles.map((path) => `- ${path}`).join("\n") || "- No allowlisted setup files matched"}
+
+## Fetched File Excerpts
+${data.repoAnalysis.fileExcerpts?.map((file) => `- ${file.path}${file.truncated ? " (truncated)" : ""}`).join("\n") || "- No file excerpts fetched"}
 
 ## Missing Signals
 ${data.repoAnalysis.missingSignals.map((signal) => `- ${signal}`).join("\n") || "- No major setup signals missing"}

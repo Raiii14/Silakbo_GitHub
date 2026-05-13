@@ -1,5 +1,5 @@
 import type { RepoAnalysis } from "../context/SetupContext";
-import { getRepository, getRepositoryTree, parseGitHubRepoUrl } from "./githubApi";
+import { getRepository, getRepositoryContent, getRepositoryTree, parseGitHubRepoUrl } from "./githubApi";
 
 const SETUP_DOC_BASENAMES = new Set([
   "PROJECT_CONTEXT",
@@ -35,6 +35,19 @@ const BUILD_MANIFESTS = new Set([
   "tox.ini",
   "noxfile.py",
 ]);
+const HIGH_SIGNAL_FILES = new Set([
+  ".gitignore",
+  "README.md",
+  "proposal.md",
+  "context/DECISIONS.md",
+  "supabase/config.toml",
+  "supabase/functions/chat/README.md",
+  "frontend/package.json",
+  "package.json",
+]);
+const MAX_EXCERPT_FILES = 8;
+const MAX_EXCERPT_CHARS = 2200;
+const MAX_FETCH_SIZE_BYTES = 40_000;
 
 const AI_EXTENSIONS = new Set([".md", ".mdx", ".mdc", ".txt", ".json", ".yml", ".yaml"]);
 const ISSUE_TEMPLATE_EXTENSIONS = new Set([".md", ".yml", ".yaml"]);
@@ -159,12 +172,62 @@ function shouldFetchPath(path: string): boolean {
   }
 
   return (
+    HIGH_SIGNAL_FILES.has(path) ||
     isBuildManifestPath(path) ||
     isIssueTemplatePath(path) ||
     isReadmePath(path) ||
     isSetupDocPath(path) ||
     isAiInstructionPath(path)
   );
+}
+
+function rankMatchedFile(path: string): number {
+  const priority = [
+    "README.md",
+    "proposal.md",
+    "context/DECISIONS.md",
+    ".gitignore",
+    "supabase/config.toml",
+    "supabase/functions/chat/README.md",
+    "frontend/package.json",
+    "package.json",
+  ];
+  const index = priority.indexOf(path);
+  return index === -1 ? priority.length : index;
+}
+
+async function fetchFileExcerpts(
+  owner: string,
+  repo: string,
+  ref: string,
+  matchedFiles: string[],
+  sizesByPath: Map<string, number | undefined>
+) {
+  const selectedFiles = [...matchedFiles]
+    .sort((left, right) => rankMatchedFile(left) - rankMatchedFile(right) || left.localeCompare(right))
+    .filter((path) => {
+      const size = sizesByPath.get(path);
+      return size === undefined || size <= MAX_FETCH_SIZE_BYTES;
+    })
+    .slice(0, MAX_EXCERPT_FILES);
+
+  const settled = await Promise.allSettled(
+    selectedFiles.map(async (path) => {
+      const content = await getRepositoryContent(owner, repo, path, ref);
+      const normalized = content.trim();
+      return {
+        path,
+        content: normalized.slice(0, MAX_EXCERPT_CHARS),
+        truncated: normalized.length > MAX_EXCERPT_CHARS,
+      };
+    })
+  );
+
+  return settled
+    .filter((result): result is PromiseFulfilledResult<{ path: string; content: string; truncated: boolean }> => {
+      return result.status === "fulfilled" && Boolean(result.value.content);
+    })
+    .map((result) => result.value);
 }
 
 function hasTestSignals(paths: string[]): boolean {
@@ -215,11 +278,19 @@ export async function reviewPublicRepository(repoUrl: string): Promise<RepoAnaly
   }
 
   const tree = await getRepositoryTree(repository.owner.login, repository.name, repository.default_branch, true);
+  const sizesByPath = new Map(tree.tree.map((entry) => [entry.path, entry.size]));
   const paths = tree.tree
     .filter((entry) => entry.path && entry.type !== "tree")
     .map((entry) => entry.path);
 
   const matchedFiles = paths.filter((path) => shouldFetchPath(path)).sort((left, right) => left.localeCompare(right));
+  const fileExcerpts = await fetchFileExcerpts(
+    repository.owner.login,
+    repository.name,
+    repository.default_branch,
+    matchedFiles,
+    sizesByPath
+  );
   const hasReadme = paths.some((path) => isReadmePath(path));
   const hasDocs = paths.some((path) => path === "docs" || path.startsWith("docs/"));
   const hasAIInstructions = paths.some((path) => isAiInstructionPath(path));
@@ -287,6 +358,7 @@ export async function reviewPublicRepository(repoUrl: string): Promise<RepoAnaly
     hasProjectGuide,
     folderStructure: topLevelEntries(paths),
     matchedFiles,
+    fileExcerpts,
     missingSignals,
     warnings,
   };
