@@ -12,3 +12,8 @@ context/*
 !context/DECISIONS.md
 backend-data-flow.md
 .env.local
+.env.example
+GOOGLE_SERVICE_ACCOUNT_JSON.json
+*service-account*.json
+*.secrets.env
+supabase/.temp/
