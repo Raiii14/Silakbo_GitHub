@@ -1,4 +1,5 @@
 import type { SetupData } from "../context/SetupContext";
+import { supabase } from "./supabaseClient";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -66,11 +67,18 @@ async function requestRemoteChatResponse(
   }
 
   try {
+    const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (data.session?.access_token) {
+      headers.Authorization = `Bearer ${data.session.access_token}`;
+    }
+
     const response = await fetch(chatApiUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(buildChatRequest(message, context, history)),
     });
 

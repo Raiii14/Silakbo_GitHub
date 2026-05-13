@@ -32,8 +32,15 @@ export interface RepoAnalysis {
   hasProjectGuide: boolean;
   folderStructure: string[];
   matchedFiles: string[];
+  fileExcerpts?: RepoFileExcerpt[];
   missingSignals: string[];
   warnings: string[];
+}
+
+export interface RepoFileExcerpt {
+  path: string;
+  content: string;
+  truncated: boolean;
 }
 
 const defaultData: SetupData = {

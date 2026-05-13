@@ -145,6 +145,7 @@ function collectSetupSnapshot(data: SetupData): SetupData {
           ...data.repoAnalysis,
           folderStructure: [...data.repoAnalysis.folderStructure],
           matchedFiles: [...data.repoAnalysis.matchedFiles],
+          fileExcerpts: (data.repoAnalysis.fileExcerpts ?? []).map((file) => ({ ...file })),
           missingSignals: [...data.repoAnalysis.missingSignals],
           warnings: [...data.repoAnalysis.warnings],
         }
@@ -578,6 +579,7 @@ function buildAssistantGreeting(data: SetupData): string {
         `Default branch: ${data.repoAnalysis.defaultBranch}`,
         `Tree scan status: ${data.repoAnalysis.treeScanStatus}`,
         `Matched setup files: ${data.repoAnalysis.matchedFiles.length}`,
+        `Fetched file excerpts: ${data.repoAnalysis.fileExcerpts?.length ?? 0}`,
         `Signals: README ${data.repoAnalysis.hasReadme ? "yes" : "no"}, docs ${data.repoAnalysis.hasDocs ? "yes" : "no"}, AI instructions ${data.repoAnalysis.hasAIInstructions ? "yes" : "no"}, decision log ${data.repoAnalysis.hasDecisionLog ? "yes" : "no"}, tests ${data.repoAnalysis.hasTestSetup ? "yes" : "no"}, project guide ${data.repoAnalysis.hasProjectGuide ? "yes" : "no"}`,
         `Warnings: ${data.repoAnalysis.warnings.length > 0 ? data.repoAnalysis.warnings.length : "none"}`,
       ].join("\n- ")
