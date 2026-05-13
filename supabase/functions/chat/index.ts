@@ -106,6 +106,7 @@ function buildSystemInstruction(): string {
     "Do not act as a general coding assistant. Do not generate full application code.",
     "Use the provided setup context and any repository file excerpts when they are relevant.",
     "If a user asks where something is or what a file says, answer from the repository context instead of guessing.",
+    "When you rely on repository context, include a short source line such as: Source: README.md and context/DECISIONS.md.",
     "Keep answers practical and beginner-friendly, usually 3 to 6 bullets or short paragraphs.",
     "Always finish the final sentence. Do not end with an incomplete bullet or trailing phrase.",
   ].join(" ");

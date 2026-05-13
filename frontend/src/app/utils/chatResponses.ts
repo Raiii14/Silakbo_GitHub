@@ -18,7 +18,19 @@ const SUGGESTIONS = [
   "How do I hand off progress to a teammate?",
 ];
 
-export function getSuggestions(): string[] {
+const REPO_SUGGESTIONS = [
+  "What does my README say this project is?",
+  "Based on my DECISIONS.md, what should I build next?",
+  "What setup gaps did you find in this repo?",
+  "Which repo files did you inspect?",
+  "What should I update before the demo?",
+];
+
+export function getSuggestions(context?: SetupData): string[] {
+  if (context?.repoAnalysis) {
+    return REPO_SUGGESTIONS;
+  }
+
   return SUGGESTIONS;
 }
 

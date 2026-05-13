@@ -410,7 +410,7 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
     }
   };
 
-  const suggestions = getSuggestions();
+  const suggestions = getSuggestions(setupData);
 
   return (
     <div className="flex-1 flex flex-col bg-[#fafafa] min-h-0">
@@ -597,8 +597,10 @@ function MarkdownText({ content, isUser }: { content: string; isUser: boolean })
   return (
     <div style={{ fontSize: "14px", lineHeight: 1.6 }}>
       {lines.map((line, i) => {
+        const displayLine = line.startsWith("- ") || line.startsWith("* ") ? line.slice(2) : line;
+
         // Code spans
-        const parts = line.split(/(`[^`]+`)/g);
+        const parts = displayLine.split(/(`[^`]+`)/g);
         const rendered = parts.map((part, j) => {
           if (part.startsWith("`") && part.endsWith("`")) {
             return (
@@ -630,7 +632,7 @@ function MarkdownText({ content, isUser }: { content: string; isUser: boolean })
           });
         });
 
-        if (line.startsWith("- ")) {
+        if (line.startsWith("- ") || line.startsWith("* ")) {
           return (
             <div key={i} className="flex items-start gap-2" style={{ marginTop: i > 0 ? "4px" : 0 }}>
               <span style={{ color: isUser ? "rgba(255,255,255,0.6)" : "#93939f", flexShrink: 0, marginTop: "2px" }}>
