@@ -534,9 +534,12 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "17px", fontWeight: 600 }}
             >
               Your setup package
+              <span className="ml-2 font-normal text-[#93939f]" style={{ fontSize: "13px" }}>
+                {files.length} files
+              </span>
             </h2>
-            <p className="text-[#93939f] m-0 mt-0.5" style={{ fontSize: "13px" }}>
-              Inspect, explain, and copy generated markdown
+            <p className="text-[#93939f] m-0 mt-1" style={{ fontSize: "12px" }}>
+              Pick a file, read the short note, then copy or download.
             </p>
           </div>
           <button
@@ -579,7 +582,7 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 px-5 py-3 border-b border-[#f2f2f2] bg-[#fafafa] shrink-0">
+      <div className="flex items-center gap-3 px-5 py-2 border-b border-[#f2f2f2] bg-[#fafafa] shrink-0">
         <button
           type="button"
           onClick={() => setActiveTab("explanation")}
@@ -620,31 +623,31 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         {activeTab === "explanation" ? (
-          <div className="p-6">
-            <div className="bg-[#f1f5ff] border border-[#dce6fd] rounded-lg p-5 mb-6" style={{ borderLeft: "3px solid #1863dc" }}>
-              <p className="text-[#1863dc] m-0" style={{ fontSize: "13px", fontWeight: 700, marginBottom: "6px" }}>
+          <div className="p-4 sm:p-5">
+            <div className="bg-[#f1f5ff] border border-[#dce6fd] rounded-md p-3.5 mb-4" style={{ borderLeft: "3px solid #1863dc" }}>
+              <p className="text-[#1863dc] m-0" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                 Why this file matters
               </p>
-              <p className="text-[#212121] m-0" style={{ fontSize: "14px", lineHeight: 1.6 }}>
+              <p className="text-[#212121] m-0 mt-1.5" style={{ fontSize: "13px", lineHeight: 1.55 }}>
                 {file.explanation}
               </p>
             </div>
 
-            <div className="bg-[#f8f8f7] border border-[#e5e7eb] rounded-lg overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-[#e5e7eb]">
+            <div className="bg-[#f8f8f7] border border-[#e5e7eb] rounded-md overflow-hidden">
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-[#e5e7eb] bg-white/80">
                 <span style={{ fontSize: "14px" }}>{file.icon}</span>
-                <span className="text-[#17171c]" style={{ fontSize: "13px", fontWeight: 700, fontFamily: "monospace" }}>
+                <span className="text-[#17171c]" style={{ fontSize: "12px", fontWeight: 700, fontFamily: "monospace" }}>
                   {file.name}
                 </span>
               </div>
               <pre
                 className="overflow-x-auto text-[#212121] m-0"
                 style={{
-                  fontSize: "12px",
-                  lineHeight: 1.7,
-                  padding: "16px",
+                  fontSize: "11.5px",
+                  lineHeight: 1.65,
+                  padding: "12px 14px",
                   fontFamily: "monospace",
-                  maxHeight: "340px",
+                  maxHeight: "min(280px, 40vh)",
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
                 }}
@@ -742,15 +745,14 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
             <p className="m-0 text-[#17171c]" style={{ fontSize: "14px", fontWeight: 700 }}>
               Setup Coach
             </p>
-            <p className="m-0 text-[#93939f]" style={{ fontSize: "12px" }}>
-              Helps with setup, scope, docs, AI instructions, and public repo review. Not full app implementation.
+            <p className="m-0 text-[#93939f] leading-snug" style={{ fontSize: "11px" }}>
+              Setup, scope, prompts, docs, public repo scan. Not full application code.
             </p>
           </div>
-          <div className="ml-auto w-2 h-2 rounded-full bg-[#28c840]" title="Online" />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 min-h-0">
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" ? (
@@ -759,9 +761,9 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
               </div>
             ) : null}
             <div
-              className="max-w-[85%] rounded-2xl"
+              className="max-w-[90%] sm:max-w-[85%] rounded-2xl"
               style={{
-                padding: "10px 14px",
+                padding: msg.role === "user" ? "9px 14px" : "8px 12px",
                 background: msg.role === "user" ? "#17171c" : "white",
                 color: msg.role === "user" ? "white" : "#212121",
                 border: msg.role === "assistant" ? "1px solid #e5e7eb" : "none",
@@ -797,18 +799,18 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
       </div>
 
       {messages.length <= 1 ? (
-        <div className="px-5 pb-3 shrink-0">
-          <p className="text-[#93939f] mb-2" style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>
-            Suggested questions
+        <div className="px-5 pb-2 shrink-0">
+          <p className="text-[#93939f] mb-1.5" style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>
+            Try asking
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             {suggestions.slice(0, 4).map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => void sendMessage(s)}
-                className="border border-[#e5e7eb] bg-white rounded-md text-[#212121] cursor-pointer hover:border-[#17171c] transition-colors text-left"
-                style={{ fontSize: "12px", padding: "6px 12px", fontWeight: 600 }}
+                className="border border-[#e5e7eb] bg-white rounded-md text-[#212121] cursor-pointer hover:border-[#17171c] transition-colors text-left leading-snug line-clamp-2"
+                style={{ fontSize: "11px", padding: "7px 10px", fontWeight: 600 }}
               >
                 {s}
               </button>
@@ -824,7 +826,7 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about scope, setup files, AI prompting, learning checkpoints..."
+            placeholder="Ask about prompts, files, scope, or handoffs..."
             rows={1}
             className="w-full resize-none outline-none border-none bg-transparent text-[#212121] placeholder-[#93939f]"
             style={{
@@ -862,42 +864,30 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
 }
 
 function buildAssistantGreeting(data: SetupData): string {
-  const startType =
-    data.startType === "new"
-      ? "New project"
-      : data.startType === "existing"
-        ? "Existing project"
-        : "Not selected";
-
   const repoLine = data.repoAnalysis
-    ? `Repo scan: **${data.repoAnalysis.fullName}** (${data.repoAnalysis.matchedFiles.length} matched files).`
+    ? `Repo linked: **${data.repoAnalysis.fullName}** (${data.repoAnalysis.matchedFiles.length} files matched in the public scan).`
     : data.repoUrl
       ? "Repo URL saved; scan not completed."
-      : "No repository linked.";
+      : "";
 
-  return [
-    "Your setup package is ready. I am **Setup Coach**. I use the answers you saved from **/setup**, not inventing project facts.",
+  const lines = [
+    "**Setup Coach** answers questions about setup, scope, docs, prompts, and your public repo scan. I do not write full application code here.",
+  ];
+  if (repoLine) {
+    lines.push(repoLine);
+  }
+  lines.push(
     "",
-    "**What I do:** scope, prompts, setup files, documentation habits, learning checkpoints, and public repo review signals.",
-    "**What I do not do:** write or ship full application code. Use your coding assistant for implementation.",
-    "",
-    "- **Starting point:** " + startType,
-    "- **Stage:** " + (data.stage || "Not selected"),
-    "- **Stack:** " + (data.stack.length ? data.stack.join(", ") : "Not selected"),
-    "- **AI tools:** " + (data.aiTools.length ? data.aiTools.join(", ") : "Not selected"),
-    "- **Guardrails:** " + (data.aiAvoid.length ? data.aiAvoid.slice(0, 4).join(", ") : "Use the generated avoid-list"),
-    "",
-    repoLine,
-    "",
-    "Ask how to paste files into your tools, tighten a prompt, or what to log after a big decision.",
-  ].join("\n");
+    "Details of your project live in the files on the left. Ask about pasting them, tightening a prompt, or what to log after a big decision.",
+  );
+  return lines.join("\n");
 }
 
 function MarkdownText({ content, isUser }: { content: string; isUser: boolean }) {
   const lines = content.split("\n");
 
   return (
-    <div style={{ fontSize: "14px", lineHeight: 1.6 }}>
+    <div style={{ fontSize: isUser ? "14px" : "13px", lineHeight: 1.55 }}>
       {lines.map((line, i) => {
         const displayLine = line.startsWith("- ") || line.startsWith("* ") ? line.slice(2) : line;
 

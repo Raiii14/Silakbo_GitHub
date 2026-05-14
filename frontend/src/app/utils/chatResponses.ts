@@ -8,22 +8,22 @@ export interface ChatMessage {
 }
 
 const SUGGESTIONS = [
-  "Do I need a decision log for this project?",
-  "Is this prompt too broad?",
-  "What should I tell my AI tool before coding?",
-  "Which files should I create first?",
-  "What should I remove from my AI instructions?",
-  "Should I build this feature now or later?",
+  "Need a decision log?",
+  "Prompt too broad?",
+  "What to tell the AI first?",
+  "Which file to open first?",
+  "Trim my AI instructions?",
+  "Build this feature now?",
   "What is a learning checkpoint?",
-  "How do I hand off progress to a teammate?",
+  "Hand off to a teammate?",
 ];
 
 const REPO_SUGGESTIONS = [
-  "What does my README say this project is?",
-  "Based on my DECISIONS.md, what should I build next?",
-  "What setup gaps did you find in this repo?",
-  "Which repo files did you inspect?",
-  "What should I update before the demo?",
+  "What does README say?",
+  "Next step from DECISIONS?",
+  "What setup gaps showed up?",
+  "Which files were scanned?",
+  "Before-demo checklist?",
 ];
 
 export function getSuggestions(context?: SetupData): string[] {
