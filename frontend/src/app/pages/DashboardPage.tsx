@@ -28,7 +28,7 @@ export function DashboardPage() {
 
   return (
     <div
-      className="h-screen bg-[#f4f4f2] flex flex-col overflow-hidden"
+      className="min-h-screen bg-[#f4f4f2] flex flex-col"
       style={{ fontFamily: "Inter, Arial, sans-serif" }}
     >
       <header className="bg-white border-b border-[#e5e7eb] px-6 h-14 flex items-center gap-4 flex-shrink-0 z-10">
@@ -63,7 +63,7 @@ export function DashboardPage() {
 
       {data.repoAnalysis ? <RepoSignalsStrip analysis={data.repoAnalysis} /> : null}
 
-      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0">
         <section className="shrink-0 border-b border-[#e2e2e6] bg-white">
           <div className="mx-auto max-w-6xl px-6 pt-12 pb-10">
             <p
@@ -119,7 +119,11 @@ export function DashboardPage() {
           </div>
         </section>
 
-        <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+        <div
+          className="flex-1 flex min-h-0 flex-col border-t border-[#e2e2e6] bg-[#f4f4f2] lg:grid lg:grid-cols-[minmax(0,17fr)_minmax(0,23fr)] lg:min-h-0"
+          role="region"
+          aria-label="Workbench: generated files and setup coach"
+        >
           <SetupPackagePanel files={files} />
           <ChatPanel setupData={setupSnapshot} />
         </div>
@@ -525,27 +529,30 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
   };
 
   return (
-    <div className="flex-1 lg:basis-0 min-h-0 flex flex-col bg-white border-r border-[#e5e7eb] overflow-hidden">
-      <div className="px-5 pt-4 pb-0 border-b border-[#e5e7eb] shrink-0">
-        <div className="flex items-center justify-between mb-3 gap-4">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white lg:min-h-0 lg:border-r lg:border-r-[#e5e7eb]">
+      <div className="shrink-0 border-b border-[#e5e7eb] bg-[#fafafa] px-5 pt-4 pb-0">
+        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
+            <p className="m-0 text-[#8b8b99] tracking-[0.12em] uppercase" style={{ fontSize: "10px", fontWeight: 700 }}>
+              Deliverables
+            </p>
             <h2
-              className="text-[#17171c] m-0"
+              className="m-0 mt-1.5 text-[#17171c]"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "17px", fontWeight: 600 }}
             >
-              Your setup package
+              Setup package
               <span className="ml-2 font-normal text-[#93939f]" style={{ fontSize: "13px" }}>
-                {files.length} files
+                · {files.length} markdown files
               </span>
             </h2>
-            <p className="text-[#93939f] m-0 mt-1" style={{ fontSize: "12px" }}>
-              Pick a file, read the short note, then copy or download.
+            <p className="m-0 mt-1 text-[#5c5c6b]" style={{ fontSize: "12px", lineHeight: 1.45 }}>
+              Snapshot of what you answered, ready to paste into your repo or AI product. Pick a file, read why it exists, then copy or download.
             </p>
           </div>
           <button
             type="button"
             onClick={handleDownloadAll}
-            className="shrink-0 flex items-center gap-1.5 bg-[#17171c] text-white border-none cursor-pointer hover:bg-[#2a2a30] transition-colors rounded-md"
+            className="flex shrink-0 cursor-pointer items-center gap-1.5 self-start rounded-md border-none bg-[#17171c] text-white transition-colors hover:bg-[#2a2a30] sm:self-auto"
             style={{ fontSize: "12px", fontWeight: 600, padding: "8px 14px" }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -555,7 +562,7 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
           </button>
         </div>
 
-        <div className="flex gap-1 overflow-x-auto pb-px" style={{ scrollbarWidth: "none" }}>
+        <div className="flex gap-0.5 overflow-x-auto pb-px [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {files.map((f, i) => (
             <button
               key={f.name}
@@ -564,13 +571,13 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
                 setActiveFile(i);
                 setActiveTab("explanation");
               }}
-              className="flex items-center gap-1.5 whitespace-nowrap border-none cursor-pointer transition-colors flex-shrink-0"
+              className="flex flex-shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap border-none transition-colors"
               style={{
                 fontSize: "12px",
                 fontWeight: activeFile === i ? 600 : 500,
                 padding: "8px 12px",
                 borderRadius: "6px 6px 0 0",
-                background: activeFile === i ? "white" : "transparent",
+                background: activeFile === i ? "white" : "rgba(255,255,255,0.35)",
                 color: activeFile === i ? "#17171c" : "#75758a",
                 borderBottom: activeFile === i ? "2px solid #17171c" : "2px solid transparent",
               }}
@@ -582,51 +589,54 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 px-5 py-2 border-b border-[#f2f2f2] bg-[#fafafa] shrink-0">
-        <button
-          type="button"
-          onClick={() => setActiveTab("explanation")}
-          className="border-none bg-transparent cursor-pointer transition-colors"
-          style={{
-            fontSize: "13px",
-            fontWeight: activeTab === "explanation" ? 600 : 500,
-            color: activeTab === "explanation" ? "#17171c" : "#75758a",
-            borderBottom: activeTab === "explanation" ? "1.5px solid #17171c" : "1.5px solid transparent",
-            padding: "2px 0",
-          }}
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[#ececf0] bg-white px-5 py-2.5">
+        <span className="hidden text-[#8b8b99] sm:inline" style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em" }}>
+          VIEW
+        </span>
+        <div
+          className="inline-flex max-w-full flex-1 flex-wrap gap-1 rounded-md border border-[#e5e7eb] bg-[#f4f4f2] p-0.5 sm:flex-initial"
+          role="tablist"
+          aria-label="File preview mode"
         >
-          Explanation
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("content")}
-          className="border-none bg-transparent cursor-pointer transition-colors"
-          style={{
-            fontSize: "13px",
-            fontWeight: activeTab === "content" ? 600 : 500,
-            color: activeTab === "content" ? "#17171c" : "#75758a",
-            borderBottom: activeTab === "content" ? "1.5px solid #17171c" : "1.5px solid transparent",
-            padding: "2px 0",
-          }}
-        >
-          File content
-        </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "explanation"}
+            onClick={() => setActiveTab("explanation")}
+            className={`min-h-[34px] rounded-[5px] px-3 text-[12px] font-semibold transition-colors sm:px-3.5 ${
+              activeTab === "explanation" ? "bg-white text-[#0f0f12] shadow-sm" : "text-[#5c5c6b] hover:text-[#17171c]"
+            }`}
+          >
+            Why it exists
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "content"}
+            onClick={() => setActiveTab("content")}
+            className={`min-h-[34px] rounded-[5px] px-3 text-[12px] font-semibold transition-colors sm:px-3.5 ${
+              activeTab === "content" ? "bg-white text-[#0f0f12] shadow-sm" : "text-[#5c5c6b] hover:text-[#17171c]"
+            }`}
+          >
+            Full file
+          </button>
+        </div>
         <button
           type="button"
           onClick={handleCopy}
-          className="ml-auto flex items-center gap-1.5 border border-[#e5e7eb] bg-white rounded-md cursor-pointer hover:border-[#17171c] transition-colors"
-          style={{ fontSize: "12px", color: "#75758a", padding: "5px 12px", fontWeight: 600 }}
+          className="ml-auto flex cursor-pointer items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white transition-colors hover:border-[#17171c]"
+          style={{ fontSize: "12px", color: "#17171c", padding: "6px 12px", fontWeight: 600 }}
         >
           {copied ? "Copied" : "Copy file"}
         </button>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {activeTab === "explanation" ? (
           <div className="p-4 sm:p-5">
-            <div className="bg-[#f1f5ff] border border-[#dce6fd] rounded-md p-3.5 mb-4" style={{ borderLeft: "3px solid #1863dc" }}>
-              <p className="text-[#1863dc] m-0" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                Why this file matters
+            <div className="mb-4 rounded-md border border-[#dce6fd] bg-[#f1f5ff] p-3.5" style={{ borderLeft: "3px solid #1863dc" }}>
+              <p className="m-0 text-[#1863dc]" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Role in your stack
               </p>
               <p className="text-[#212121] m-0 mt-1.5" style={{ fontSize: "13px", lineHeight: 1.55 }}>
                 {file.explanation}
@@ -655,7 +665,7 @@ function SetupPackagePanel({ files }: { files: GeneratedFile[] }) {
                 {file.content.slice(0, 800)}
                 {file.content.length > 800 ? (
                   <span className="text-[#93939f]">
-                    {"\n"}... {file.content.length - 800} more characters. Open "File content" for the full file.
+                    {"\n"}... {file.content.length - 800} more characters. Open the Full file tab for everything.
                   </span>
                 ) : null}
               </pre>
@@ -735,33 +745,37 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
   const suggestions = getSuggestions(setupData);
 
   return (
-    <div className="flex-1 lg:basis-0 flex flex-col bg-[#fafafa] min-h-0 overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#e5e7eb] bg-white shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-white border border-[#e8e8ec] flex items-center justify-center shrink-0">
-            <ClearStackLogoMark size={12} withChip={false} />
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-t-[#e5e7eb] bg-[#f6f6f4] lg:min-h-0 lg:border-l lg:border-l-[#e5e7eb] lg:border-t-0">
+      <div className="shrink-0 border-b border-[#e5e7eb] bg-white px-5 py-3">
+        <div className="flex items-start gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[#e8e8ec] bg-[#fafafa]">
+            <ClearStackLogoMark size={14} withChip={false} />
           </div>
-          <div className="min-w-0">
-            <p className="m-0 text-[#17171c]" style={{ fontSize: "14px", fontWeight: 700 }}>
-              Setup Coach
+          <div className="min-w-0 flex-1">
+            <p className="m-0 text-[#8b8b99] tracking-[0.12em] uppercase" style={{ fontSize: "10px", fontWeight: 700 }}>
+              Setup coach
             </p>
-            <p className="m-0 text-[#93939f] leading-snug" style={{ fontSize: "11px" }}>
-              Setup, scope, prompts, docs, public repo scan. Not full application code.
+            <p className="m-0 mt-0.5 text-[#17171c]" style={{ fontSize: "15px", fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+              Ask about your snapshot
+            </p>
+            <p className="m-0 mt-1 text-[#5c5c6b] leading-snug" style={{ fontSize: "12px", lineHeight: 1.45 }}>
+              Same answers as your files: prompts, scope, handoffs, and public repo signals. This panel is intentionally wide for reading threads; it
+              does not run or edit your codebase.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" ? (
-              <div className="w-6 h-6 rounded-full bg-white border border-[#e8e8ec] flex items-center justify-center flex-shrink-0 mr-2 mt-1">
+              <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e8e8ec] bg-white">
                 <ClearStackLogoMark size={10} withChip={false} />
               </div>
             ) : null}
             <div
-              className="max-w-[90%] sm:max-w-[85%] rounded-2xl"
+              className={`min-w-0 rounded-2xl ${msg.role === "assistant" ? "max-w-[min(100%,52rem)] flex-1" : "max-w-[90%] sm:max-w-[85%]"}`}
               style={{
                 padding: msg.role === "user" ? "9px 14px" : "8px 12px",
                 background: msg.role === "user" ? "#17171c" : "white",
@@ -777,8 +791,8 @@ function ChatPanel({ setupData }: { setupData: SetupData }) {
 
         {isTyping ? (
           <div className="flex justify-start">
-            <div className="w-6 h-6 rounded-full bg-[#17171c] flex items-center justify-center flex-shrink-0 mr-2 mt-1">
-              <div className="w-2 h-2 rounded-full bg-[#ff7759]" />
+            <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e8e8ec] bg-white">
+              <div className="h-2 w-2 rounded-full bg-[#ff7759]" />
             </div>
             <div
               className="bg-white border border-[#e5e7eb] rounded-2xl px-4 py-3 flex items-center gap-1"
@@ -878,7 +892,7 @@ function buildAssistantGreeting(data: SetupData): string {
   }
   lines.push(
     "",
-    "Details of your project live in the files on the left. Ask about pasting them, tightening a prompt, or what to log after a big decision.",
+    "Details of your project live in the **Setup package** panel. Ask about pasting them, tightening a prompt, or what to log after a big decision.",
   );
   return lines.join("\n");
 }
