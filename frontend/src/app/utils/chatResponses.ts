@@ -105,11 +105,66 @@ async function requestRemoteChatResponse(
   }
 }
 
+const SETUP_COACH_CODE_REFUSAL =
+  "I can’t write or ship full application code from here — **Setup Coach** is only for setup, scope, documentation, AI instructions, and your public repo review signals.\n\n" +
+  "If you paste what you’re trying to build, I can help you **turn it into a safe, scoped prompt** (or point you to the right lines in `AI_WORKFLOW.md` / `PROJECT_CONTEXT.md`) so your coding assistant does the implementation.";
+
+function looksLikeImplementationCodingRequest(message: string): boolean {
+  const q = message.toLowerCase().trim();
+  if (q.length < 18) {
+    return false;
+  }
+
+  if (/^(should|why|how|when|what|is|are)\b/i.test(q)) {
+    return false;
+  }
+
+  const coachingHints = [
+    "setup file",
+    "ai_workflow",
+    "project_context",
+    "decisions.md",
+    "handoff",
+    "project handoff",
+    "repository review",
+    "repo review",
+    "how should i prompt",
+    "prompt too broad",
+    "scope creep",
+    "learning checkpoint",
+    "decision log",
+    "which files",
+    "tell my ai",
+    "custom instruction",
+    "gemini",
+  ];
+  if (coachingHints.some((hint) => q.includes(hint))) {
+    return false;
+  }
+
+  if (/^```[\s\S]{40,}/m.test(message) || (q.includes("```") && message.length > 140)) {
+    return true;
+  }
+
+  return (
+    /\b(implement|build out|code up)\s+(this|the|my|a)\b/i.test(message) ||
+    /\b(write|generate|create)\s+(me\s+)?(the\s+)?(full|entire|complete)\b/i.test(q) ||
+    /\b(write|generate|create)\s+(a|the|my)\s+.{0,48}\b(component|function|class|endpoint|api|migration|hook|screen|page)\b/i.test(message) ||
+    /\b(fix|debug)\s+this\s+(code|bug|error)\b/i.test(q) ||
+    /\brefactor\s+(my|the|this)\s+.{0,24}\b(code|component)\b/i.test(message) ||
+    /\bgive\s+me\s+the\s+(code|implementation)\b/i.test(q)
+  );
+}
+
 export async function getChatResponse(
   message: string,
   context: SetupData,
   history: ChatMessage[]
 ): Promise<string> {
+  if (looksLikeImplementationCodingRequest(message)) {
+    return SETUP_COACH_CODE_REFUSAL;
+  }
+
   const remoteResponse = await requestRemoteChatResponse(message, context, history);
   if (remoteResponse) {
     return remoteResponse;
@@ -168,12 +223,12 @@ export async function getChatResponse(
 
   // ── Progress handoff ─────────────────────────────────────────────────
   if (q.includes("handoff") || q.includes("hand off") || q.includes("teammate") || q.includes("resume") || q.includes("session")) {
-    return `Your \`PROGRESS_HANDOFF.md\` file is designed for exactly this. Before ending a session or handing off to a teammate:\n\n1. Update "Current Status" — what you're working on and what's blocking\n2. Check off completed items in the Stage Checklist\n3. Add any open questions\n4. Copy the **Context for Next Session** block and paste it into the next AI session as your opening message\n\nThis prevents the most common AI session problem: the assistant doesn't know where you left off and either repeats work or suggests features you've already decided against.\n\nFor **${stage}** stage, the most important thing to hand off is: what's done, what's decided, and what the next concrete step is.`;
+    return `Your \`PROGRESS_HANDOFF.md\` (**Project Handoff**) is the short continuity note between sessions or teammates.\n\nBefore you close out:\n1. Update "Current Status" — what you're working on and what's blocking\n2. Check off completed items in the Stage Checklist\n3. Add any open questions\n4. Copy the **Context for Next Session** block into the next AI chat as your opening message\n\n**Why it matters:** READMEs, tickets, and older prompts drift. When two documents disagree, assistants pick the wrong "facts." A fresh handoff line—what changed, what is still true, what is next—prevents that silent conflict.\n\nFor **${stage}** stage, prioritize: what's done, what's decided, and the next concrete step.`;
   }
 
   // ── AI instructions / setup files ────────────────────────────────────
   if (q.includes("setup file") || q.includes("ai_workflow") || q.includes("project_context") || q.includes("cursorrules") || q.includes("claude.md")) {
-    return `Your generated setup files serve different purposes:\n\n- **\`PROJECT_CONTEXT.md\`** — Paste into any new AI session as background context. Keeps the assistant from making assumptions about your stack or goals.\n- **\`AI_WORKFLOW.md\`** — Use this as your AI tool's instruction file. In Cursor, name it \`.cursorrules\`. For Claude, paste it as a system prompt. For ChatGPT, add it to custom instructions.\n- **\`DECISIONS.md\`** — Update as you make architectural choices. Reference it when the AI suggests alternatives you've already rejected.\n- **\`PROGRESS_HANDOFF.md\`** — Use between sessions. Always update before closing your editor.\n\nFor **${aiToolInstructions(context)}** specifically, the most useful file is \`AI_WORKFLOW.md\`.`;
+    return `Your generated setup files serve different purposes:\n\n- **\`PROJECT_CONTEXT.md\`** — Paste into any new AI session as background context. Keeps the assistant from making assumptions about your stack or goals.\n- **\`AI_WORKFLOW.md\`** — Your portable instruction pack: put it wherever your tool keeps long-lived rules (project instructions, workspace rules, Copilot instruction files, and so on).\n- **\`DECISIONS.md\`** — Update as you make architectural choices. Reference it when the AI suggests alternatives you've already rejected.\n- **\`PROGRESS_HANDOFF.md\` (Project Handoff)** — Short continuity note between sessions or teammates: what changed, what is still true, what is next.\n\nFor **${aiToolInstructions(context)}** specifically, the highest-leverage starting point is usually \`AI_WORKFLOW.md\`, with \`PROJECT_CONTEXT.md\` attached at session start.`;
   }
 
   // ── Scope creep ───────────────────────────────────────────────────────
@@ -218,6 +273,8 @@ function aiToolInstructions(context: SetupData): string {
   if (context.aiTools.includes("Cursor")) return "Cursor";
   if (context.aiTools.includes("Claude")) return "Claude";
   if (context.aiTools.includes("GitHub Copilot")) return "GitHub Copilot";
+  if (context.aiTools.includes("Gemini")) return "Gemini";
+  if (context.aiTools.includes("Codex")) return "Codex";
   if (context.aiTools.includes("ChatGPT")) return "ChatGPT";
   return "your AI tool";
 }

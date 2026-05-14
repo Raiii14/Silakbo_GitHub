@@ -301,7 +301,7 @@ Keep entries short — the goal is context, not documentation for its own sake.
       name: "PROGRESS_HANDOFF.md",
       icon: "🔁",
       explanation:
-        "Use this file when handing off work to a teammate, resuming after a break, or starting a new AI session. A concise handoff prevents the AI from misunderstanding where you are and avoids repeating work.",
+        "Project Handoff keeps the project's current truth in one place. When decisions, requirements, or implementation details change, it records what changed, what is still true, what may be outdated, and what should happen next so teammates and future AI sessions do not follow stale instructions.",
       content: `# Progress Handoff
 > Last updated: ${today()}
 

@@ -101,14 +101,15 @@ const ALL_STEPS: Step[] = [
   },
   {
     id: "ai_tools",
-    title: "What AI tools are you using?",
-    subtitle: "We will generate tool-specific instruction snippets where applicable.",
+    title: "Which AI tools do you need instructions for?",
+    subtitle: "ClearStack will shape paste targets and checklists for these tools. You can pick several.",
     type: "multi",
     field: "aiTools",
     options: [
       { label: "ChatGPT", value: "ChatGPT" },
       { label: "Claude", value: "Claude" },
       { label: "Codex", value: "Codex" },
+      { label: "Gemini", value: "Gemini" },
       { label: "Cursor", value: "Cursor" },
       { label: "GitHub Copilot", value: "GitHub Copilot" },
       { label: "Other tools", value: "Other tools" },
@@ -176,8 +177,8 @@ const ALL_STEPS: Step[] = [
   },
   {
     id: "handoff",
-    title: "Do you need a progress handoff document?",
-    subtitle: "Useful for team projects or multi-session work.",
+    title: "Include a Project Handoff template?",
+    subtitle: "Keeps “current truth” in one place when docs, code, and AI prompts drift apart.",
     type: "single",
     field: "progressHandoff",
     options: [
